@@ -11,7 +11,8 @@ RoxygenNote: 7.0.2
 Depends:
     beautier (>= 2.3.2),
     babette (>= 2.1.1),
-    pirouette
+    pirouette,
+    ssh
 Imports:
     ape,
     beastier (>= 2.1.1),
