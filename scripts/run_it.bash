@@ -7,12 +7,11 @@ chosen_partition=gelifes
 cd /home/$USER/
 mkdir -p $project
 cd /home/$USER/$project/
-mkdir -p results
-mkdir -p data
-mkdir -p logs
 
 funname=$1
 n_replicates=$2
+
+mkdir -p ${funname}
 
 R_file_name=R-${funname}.R
 bash_file_name=bash-${funname}.bash
