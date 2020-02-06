@@ -1,11 +1,11 @@
-#' Errors_vs_ntaxa
+#' Execute pirouette's dd experiment
 #' @author Giovanni Laudanno
 #' @inheritParams default_params_doc
 #' @return nothing
 #' @export
-errors_vs_ntaxa <- function(n_replicates = 2) {
+errors_vs_dd <- function(n_replicates = 2) {
 
-  # check beast
+  # beast?
   if (beastier::is_beast2_installed() == FALSE) {
     beastier::install_beast2()
   }
@@ -15,51 +15,58 @@ errors_vs_ntaxa <- function(n_replicates = 2) {
   stopifnot(beastier::is_beast2_installed())
   stopifnot(mauricer::is_beast2_ns_pkg_installed())
 
-  suppressMessages(library(pirouette))
-  suppressMessages(library(ggplot2))
-
-  # folder setting
-  root_folder <- file.path(getwd(), get_pkg_name())
-  example_folder <- file.path(root_folder, "error_vs_ntaxa")
-  dir.create(example_folder, showWarnings = FALSE, recursive = TRUE)
-  setwd(example_folder)
-
   # parsetting
-  l_parses <- 4
-  parses <- vector("list", l_parses)
-  for (i in seq_len(l_parses)) {
-    parses[[i]] <- data.frame(
-      lambda = 0.8,
-      mu = 0,
-      crown_age = 10,
-      cond = 1,
-      n_0 = 2,
-      n_taxa = 10 * i
-    )
+  parses <- vector("list", 3)
+  parses[[3]] <- parses[[2]] <- parses[[1]] <- data.frame(
+    lambda = 0.8,
+    mu = 0.1,
+    kk = 40,
+    crown_age = 0,
+    cond = 1,
+    ddmodel = 1,
+    n_0 = 2
+  )
+  for (i in seq_along(parses)){
+    parses[[i]]$crown_age <- 5 * i
   }
 
   # simulate trees
   sim_data <- vector("list", length(parses))
-  for (i in seq_len(l_parses)) {
+  for (i in seq_along(parses)){
     pars <- parses[[i]]
+    loglik <- rep(NA, n_replicates)
     for (seed in seq_len(n_replicates)) {
       set.seed(seed)
-      sim_data[[i]][[seed]] <- TESS::tess.sim.taxa.age(
-        n = 1,
-        nTaxa = pars$n_taxa,
+      sim_data[[i]][[seed]] <- DDD::dd_sim(
+        pars = c(pars$lambda, pars$mu, pars$kk),
         age = pars$crown_age,
-        lambda = pars$lambda,
-        mu = pars$mu
-      )[[1]]
-      ape::is.ultrametric(sim_data[[i]][[seed]])
+        ddmodel = pars$ddmodel
+      )
+      loglik[seed] <- DDD::dd_loglik(
+        pars1 = c(pars$lambda, pars$mu, pars$kk),
+        pars2 = c(
+          2 * pars$kk,
+          pars$ddmodel,
+          pars$cond,
+          0,
+          0,
+          pars$n_0
+        ),
+        brts = sim_data[[i]][[seed]]$brts,
+        missnumspec = 0
+      )
+      sim_data[[i]][[seed]]$loglik <- loglik[seed]
+      sim_data[[i]][[seed]]$gamma <- phytools::gammatest(
+        phytools::ltt(sim_data[[i]][[seed]]$tes, plot = FALSE, gamma = FALSE)
+      )$gamma
     }
   }
 
   # create pir_params
   pir_paramseses <- vector("list", length(parses))
-  for (i in seq_len(l_parses)) {
+  for (i in seq_along(parses)){
     for (seed in seq_len(n_replicates)) {
-      phylogeny1 <- sim_data[[i]][[1]]
+      phylogeny1 <- sim_data[[i]][[1]]$tes
       pir_paramseses[[i]][[seed]] <- pirouette::create_test_pir_params(
         alignment_params = pirouette::create_alignment_params(
           sim_tral_fun = pirouette::get_sim_tral_with_std_nsm_fun(
@@ -83,7 +90,7 @@ errors_vs_ntaxa <- function(n_replicates = 2) {
         ),
         experiments = pirouette::create_all_experiments(),
         error_measure_params = pirouette::create_error_measure_params(
-          error_fun = pirouette::get_nltt_error_fun()
+          error_fun = pirouette::get_gamma_error_fun()
         )
       )
     }
@@ -92,14 +99,12 @@ errors_vs_ntaxa <- function(n_replicates = 2) {
   # pir run!
   pir_outs <- vector("list", length(parses))
   for (i in seq_along(parses)){
-    phylogenies <- sim_data[[i]]
+    phylogenies <- lapply(sim_data[[i]], function(x) x$tes)
     pir_paramses <- pir_paramseses[[i]]
     pir_outs[[i]] <- pirouette::pir_runs(
       phylogenies = phylogenies,
       pir_paramses = pir_paramses
     )
   }
-
-  save(pir_outs, file = paste0("pir_outs_GL_", n_replicates))
   pir_outs
 }
