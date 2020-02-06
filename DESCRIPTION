@@ -1,0 +1,48 @@
+Package: PirouetteExamples
+Title: Run Pirouette examples.
+Version: 0.0.0.9000
+Authors@R: 
+    person("Giovanni", "Laudanno", email = "glaudanno@gmail.com", role = c("aut", "cre"))
+Description: Run Pirouette examples.
+License: What license it uses
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Depends:
+    beautier (>= 2.3.2),
+    babette (>= 2.1.1),
+    pirouette
+Imports:
+    ape,
+    beastier (>= 2.1.1),
+    DDD,
+    dplyr,
+    geiger,
+    magrittr,
+    mauricer (>= 2.0.5),
+    mcbette (>= 1.7),
+    nodeSub (>= 0.5),
+    phangorn,
+    phytools,
+    plyr,
+    pryr,
+    rappdirs,
+    remotes,
+    Rmpfr,
+    stringr,
+    TESS,
+    testit,
+    tidyr,
+    tracerer (>= 2.0.2),
+    xtable
+Suggests:
+    becosys,
+    devtools,
+    ggplot2,
+    knitr,
+    lintr,
+    nLTT (>= 1.4.3),
+    PBD,
+    rmarkdown,
+    testthat (>= 2.1.0)
+SystemRequirements: BEAST2 (https://www.beast2.org/)

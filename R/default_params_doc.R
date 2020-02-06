@@ -2,10 +2,13 @@
 #' documentation.
 #' @param account a peregrine account
 #' @param age the age of the phylogeny
+#' @param example_no number of the example
+#' @param function_name name of the function
 #' @param session a ssh session
 #' @param lambda speciation rate
 #' @param mu extinction rate
 #' @param message a message to be print
+#' @param n_replicates number of replicates
 #' @param t time
 #' @param verbose choose if you want to print the output or not
 #' @author Documentation by Giovanni Laudanno,
@@ -15,11 +18,14 @@
 default_params_doc <- function(
   account,
   age,
-  session,
+  example_no,
+  function_name,
   lambda,
-  mu,
-  t,
   message,
+  mu,
+  n_replicates,
+  session,
+  t,
   verbose
 ) {
   # Nothing

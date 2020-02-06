@@ -1,0 +1,10 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.travis\.yml$
+^appveyor\.yml$
+^doc$
+^pics$
+^scripts$
+^CONTRIBUTING\.md$
+^pull_upstream\.sh$
+^CODE_OF_CONDUCT\.md$
