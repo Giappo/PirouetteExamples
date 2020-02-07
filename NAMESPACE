@@ -2,9 +2,5 @@
 
 export(errors_vs_dd)
 export(errors_vs_ntaxa)
-export(get_function_list)
 export(get_pkg_name)
 export(open_example_script)
-export(run_it)
-export(run_pirouette_example)
-export(upload_bash_scripts)
